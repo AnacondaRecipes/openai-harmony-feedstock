@@ -42,6 +42,7 @@ test:
   requires:
     - pytest
     - abi3audit
+    - pip
   commands:
     - pip check
     - pytest tests
