@@ -76,5 +76,5 @@ about:
   dev_url: https://github.com/openai/harmony
 
 extra:
-    recipe-maintainers:
+  recipe-maintainers:
     - shermansiu
