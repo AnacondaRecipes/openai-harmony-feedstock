@@ -68,7 +68,9 @@ about:
     you. gpt-oss should not be used without using the harmony format as it
     will not work correctly.
   license: Apache-2.0
-  license_file: LICENSE
+  license_file:
+    - LICENSE
+    - THIRDPARTY.yml
   license_family: Apache
   doc_url: https://github.com/openai/harmony/tree/main/docs
   dev_url: https://github.com/openai/harmony
