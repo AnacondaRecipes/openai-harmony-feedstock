@@ -1,0 +1,79 @@
+{% set name = "openai-harmony" %}
+{% set version = "0.0.8" %}
+
+package:
+  name: {{ name|lower }}
+  version: {{ version }}
+
+source:
+  url: https://pypi.org/packages/source/{{ name[0] }}/{{ name }}/openai_harmony-{{ version }}.tar.gz
+  sha256: 6e43f98e6c242fa2de6f8ea12eab24af63fa2ed3e89c06341fb9d92632c5cbdf
+
+build:
+  skip: true  # [py<310]
+  number: 0
+  script: 
+    - {{ PYTHON }} -m pip install . -vv --no-deps --no-build-isolation
+    - cargo-bundle-licenses --format yaml --output THIRDPARTY.yml
+
+requirements:
+  build:
+    - {{ compiler('rust') }}
+    - {{ compiler('c') }}
+    - {{ stdlib('c') }}
+    - cargo-bundle-licenses
+
+  host:
+    - python
+    - maturin >=1.8,<2.0
+    - pip
+
+  run:
+    - python
+    - pydantic >=2.11.7
+
+test:
+  source_files:
+    - tests/
+    - test-data/
+  imports:
+    - openai_harmony
+  requires:
+    - pytest
+    - abi3audit
+    - pip
+  commands:
+    - pip check
+    - pytest tests
+    - export SP_DIR=$(python -c "import site; print(site.getsitepackages()[0])") # [unix]
+    - abi3audit $SP_DIR/openai_harmony/openai_harmony.abi3.so -s -v --assume-minimum-abi3 {{ python }} # [unix]
+    - set "SP_DIR=%PREFIX%\\Lib\\site-packages" # [win]
+    - abi3audit %SP_DIR%\\openai_harmony\\openai_harmony.pyd -s -v --assume-minimum-abi3 {{ python }} # [win]
+
+
+about:
+  home: https://pypi.org/project/openai-harmony/
+  summary: OpenAI's response format for its open-weight model series gpt-oss
+  description: |
+    The gpt-oss models were trained on the harmony response format for
+    defining conversation structures, generating reasoning output and
+    structuring function calls. If you are not using gpt-oss directly
+    but through an API or a provider like HuggingFace, Ollama, or vLLM,
+    you will not have to be concerned about this as your inference solution
+    will handle the formatting. If you are building your own inference
+    solution, this guide will walk you through the prompt format. The
+    format is designed to mimic the OpenAI Responses API, so if you have
+    used that API before, this format should hopefully feel familiar to
+    you. gpt-oss should not be used without using the harmony format as it
+    will not work correctly.
+  license: Apache-2.0
+  license_file:
+    - LICENSE
+    - THIRDPARTY.yml
+  license_family: Apache
+  doc_url: https://github.com/openai/harmony/tree/main/docs
+  dev_url: https://github.com/openai/harmony
+
+extra:
+  recipe-maintainers:
+    - shermansiu
